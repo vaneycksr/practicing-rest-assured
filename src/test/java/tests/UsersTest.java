@@ -2,6 +2,7 @@ package tests;
 
 import domain.User;
 import org.apache.http.HttpStatus;
+import org.junit.Ignore;
 import org.junit.Test;
 import support.BaseTest;
 
@@ -22,6 +23,7 @@ public class UsersTest extends BaseTest {
     public void testValidarPaginaEspecifica(){
 
         given().
+                // param -> como se fosse a query na URI
                 param("page","2").
         when().
                 get(USERS_ENDPOINT).
@@ -86,11 +88,113 @@ public class UsersTest extends BaseTest {
 
     }
 
-    // TODO implementar testes do metodo UPDATE
+    @Test
+    public void testCriaUsuarioApenasComCampoName(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("name","van");
+
+        given().
+                body(user).
+        when().
+                post(USERS_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_CREATED).
+                body("job",is(nullValue())).
+                body("name",is("van")).
+                body("createdAt",is(notNullValue()));
+
+    }
+
+    @Test
+    public void testCriarUsuarioApenasComCampoJob(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("job","testador");
+
+        given().
+                body(user).
+        when().
+                post(USERS_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_CREATED).
+                body("name",is(nullValue())).
+                body("job", is("testador")).
+                body("createdAt",is(notNullValue()));
+
+    }
+
     @Test
     public void testEditarUsuario(){
 
+        Map<String, String> user = new HashMap<>();
+        user.put("name","joao");
+        user.put("job","dev");
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("name",is("joao")).
+                body("job",is("dev")).
+                body("updatedAt", is(notNullValue()));
+
     }
+
+    @Test
+    public void testEditarUsuarioApenasComCampoName(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("name","joao");
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("job",is(nullValue())).
+                body("name",is("joao")).
+                body("updatedAt",is(notNullValue()));
+
+    }
+
+    @Test
+    public void testEditarUsuarioApenasComCampoJob(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("job","dev junior");
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("name",is(nullValue())).
+                body("job",is("dev junior")).
+                body("updatedAt",is(notNullValue()));
+    }
+
+    // O teste falha pois o retorno desse requisição não é do tipo JSON
+    @Ignore
+    public void testDeletarUsuario(){
+
+        given().
+                pathParam("userId",50).
+        when().
+                delete(SINGLE_USER_ENDPOINT).
+
+        then().
+                statusCode(HttpStatus.SC_NO_CONTENT);
+    }
+
+    // TODO implementar testes do recurso REGISTER
 
 
 }
