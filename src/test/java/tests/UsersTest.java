@@ -194,7 +194,4 @@ public class UsersTest extends BaseTest {
                 statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
-    // TODO implementar testes do recurso REGISTER
-
-
 }

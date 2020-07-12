@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
     // atributos que podem vim no JSON
@@ -21,5 +21,6 @@ public class User {
     private String last_name;
     private String avatar;
     private String job;
-    
+    private String password;
+
 }
