@@ -8,10 +8,12 @@ import support.BaseTest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+
 
 public class UsersTest extends BaseTest {
 
@@ -66,7 +68,6 @@ public class UsersTest extends BaseTest {
         then().
                 statusCode(HttpStatus.SC_NOT_FOUND).
                 body(equalTo("{}"));
-
     }
 
     @Test
@@ -85,7 +86,6 @@ public class UsersTest extends BaseTest {
                 body("name", is("vaneyck")).
                 body("job", is("QA")).
                 body("createdAt", is(notNullValue()));
-
     }
 
     @Test
@@ -125,6 +125,41 @@ public class UsersTest extends BaseTest {
     }
 
     @Test
+    public void testCriarUsuarioComOsCamposVazios(){
+        Map<String, String> user = new HashMap<>();
+        user.put("name","");
+        user.put("job","");
+
+        given().
+                body(user).
+        when().
+                post(USERS_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_CREATED).
+                body("name", is("")).
+                body("job", is("")).
+                body("createdAt", is(notNullValue()));
+    }
+
+    @Test
+    public void testCriarUsuarioComOsCamposNull(){
+        Map<String, String> user = new HashMap<>();
+        user.put("name",null);
+        user.put("job",null);
+
+        given().
+                body(user).
+        when().
+                post(USERS_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_CREATED).
+                body("name", is(nullValue())).
+                body("job", is(nullValue())).
+                body("createdAt", is(notNullValue()));
+    }
+
+
+    @Test
     public void testEditarUsuario(){
 
         Map<String, String> user = new HashMap<>();
@@ -140,6 +175,46 @@ public class UsersTest extends BaseTest {
                 statusCode(HttpStatus.SC_OK).
                 body("name",is("joao")).
                 body("job",is("dev")).
+                body("updatedAt", is(notNullValue()));
+
+    }
+
+    @Test
+    public void testEditarUsuarioComCamposVazios(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("name","");
+        user.put("job","");
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("name",is("")).
+                body("job",is("")).
+                body("updatedAt", is(notNullValue()));
+
+    }
+
+    @Test
+    public void testEditarUsuarioComCamposNull(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("name",null);
+        user.put("job",null);
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("name",is(nullValue())).
+                body("job",is(nullValue())).
                 body("updatedAt", is(notNullValue()));
 
     }
@@ -164,6 +239,42 @@ public class UsersTest extends BaseTest {
     }
 
     @Test
+    public void testEditarUsuarioApenasComCampoNameVazio(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("name","");
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("job",is(nullValue())).
+                body("name",is("")).
+                body("updatedAt",is(notNullValue()));
+    }
+
+    @Test
+    public void testEditarUsuarioApenasComCampoNameNull(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("name",null);
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("job",is(nullValue())).
+                body("name",is(nullValue())).
+                body("updatedAt",is(notNullValue()));
+    }
+
+    @Test
     public void testEditarUsuarioApenasComCampoJob(){
 
         Map<String, String> user = new HashMap<>();
@@ -181,17 +292,65 @@ public class UsersTest extends BaseTest {
                 body("updatedAt",is(notNullValue()));
     }
 
+    @Test
+    public void testEditarUsuarioApenasComCampoJobVazio(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("job","");
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("name",is(nullValue())).
+                body("job",is("")).
+                body("updatedAt",is(notNullValue()));
+    }
+
+    @Test
+    public void testEditarUsuarioApenasComCampoJobNull(){
+
+        Map<String, String> user = new HashMap<>();
+        user.put("job",null);
+
+        given().
+                pathParam("userId",10).
+                body(user).
+        when().
+                put(SINGLE_USER_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                body("name",is(nullValue())).
+                body("job",is(nullValue())).
+                body("updatedAt",is(notNullValue()));
+    }
+
     // O teste falha pois o retorno desse requisição não é do tipo JSON
-    @Ignore
+    @Test
     public void testDeletarUsuario(){
 
         given().
                 pathParam("userId",50).
         when().
                 delete(SINGLE_USER_ENDPOINT).
-
         then().
                 statusCode(HttpStatus.SC_NO_CONTENT);
+    }
+
+    @Test
+    public void testTempoDeRespostaDeEndpointEspecifico(){
+
+        given().
+                param("delay",3).
+        when().
+                get(USERS_ENDPOINT).
+        then().
+                statusCode(HttpStatus.SC_OK).
+                time(lessThan(5L), TimeUnit.SECONDS);
+
     }
 
 }

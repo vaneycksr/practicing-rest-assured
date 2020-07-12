@@ -209,11 +209,11 @@ public class RegisterTest extends BaseTest {
                 body("token", is(notNullValue()));
     }
 
-    public String extrairTokenRegistroDoUsuario(){
+    public String extrairTokenRegistroDoUsuario(String email, String password){
 
         User register = new User();
-        register.setEmail("eve.holt@reqres.in");
-        register.setPassword("pistol");
+        register.setEmail(email);
+        register.setPassword(password);
 
         return given().
                 body(register).
@@ -225,7 +225,5 @@ public class RegisterTest extends BaseTest {
                 path("token");
 
     }
-
-    // TODO implenentar os testes do recurso UNKNOWN
 
 }

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class User {
 
     // atributos que podem vim no JSON
-    private Integer id;
+    private int id;
     private String email;
     @JsonAlias("name")
     private String first_name;
